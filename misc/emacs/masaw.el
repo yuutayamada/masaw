@@ -92,8 +92,11 @@
 
 (defun masaw-parse-file (file)
   "Parse json FILE."
-  (json-read-from-string
-   (shell-command-to-string (concat masaw-program " -file " file))))
+  (let ((json (json-read-from-string
+               (shell-command-to-string (concat masaw-program " -file " file)))))
+    (if (json-alist-p json)
+        json
+      (error (format "cannot produce json format from %s" file)))))
 
 (defun masaw-extract-braces ()
   "Organize braces."
