@@ -50,12 +50,14 @@
 (defun masaw ()
   "Hide some Golang's {}."
   (interactive)
-  (when (eq major-mode 'go-mode)
-    (masaw-reset)
-    (setq-local masaw-covered-flag t)
-    (masaw-cancel-timer)
-    (masaw-append (append `(,buffer-file-truename) (masaw-extract-braces)))
-    (masaw-register-timer)))
+  (condition-case err
+      (when (and (eq major-mode 'go-mode) (file-exists-p buffer-file-truename))
+        (masaw-reset)
+        (setq-local masaw-covered-flag t)
+        (masaw-cancel-timer)
+        (masaw-append (append `(,buffer-file-truename) (masaw-extract-braces)))
+        (masaw-register-timer))
+    (error (format "%s" err))))
 
 (defun masaw-append (newtask)
   "Append NEWTASK."
