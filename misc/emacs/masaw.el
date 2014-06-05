@@ -52,6 +52,7 @@
   (interactive)
   (condition-case err
       (when (and (eq major-mode 'go-mode) (file-exists-p buffer-file-truename))
+        (add-hook 'post-self-insert-hook 'masaw-reset)
         (masaw-reset)
         (setq-local masaw-covered-flag t)
         (masaw-cancel-timer)
@@ -133,9 +134,11 @@ If you set ADJUST, then adjust column point."
 (defun masaw-reset ()
   "Reset covered stuff."
   (interactive)
-  (when masaw-covered-flag
-    (setq-local masaw-covered-flag nil))
-  (decompose-region (point-min) (point-max)))
+  (if (eq major-mode 'go-mode)
+      (when masaw-covered-flag
+        (setq-local masaw-covered-flag nil)
+        (decompose-region (point-min) (point-max)))
+    (remove-hook 'post-self-insert-hook 'masaw-reset)))
 
 (defadvice gofmt-before-save
   (around masaw-add-hook activate)
