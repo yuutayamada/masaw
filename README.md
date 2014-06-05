@@ -1,5 +1,4 @@
-# MASAW
-
+# MASAW ![Build Status](https://travis-ci.org/yuutayamada/masaw.svg?branch=master)
 This is cosmetic program for golang and Emacs.
 You can get rid of some golang's braces and you can see python like syntax.
 
