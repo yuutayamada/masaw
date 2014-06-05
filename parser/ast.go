@@ -1,11 +1,15 @@
-package main
+package masaw
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 )
+
+type Info struct {
+	File   string
+	Braces *[]Brace
+}
 
 type Brace struct {
 	LBrace *Position
@@ -17,33 +21,19 @@ type Position struct {
 	Column int // width from left
 }
 
-type Info struct {
-	File   string
-	Braces *[]Brace
-}
+var bracePositions []Brace
 
-var (
-	info    Info = Info{}
-	options *Options
-)
-
-func main() {
-	if options = cmdParse(); options.File == "" {
-		fmt.Println("File not found, you need to specify file by -file option.")
-		return
-	}
-	info = Info{File: options.File}
-	getPositions(info.File, "")
-	printer(&info)
-}
-
-func getPositions(filename, src string) {
-	var bracePositions []Brace
+func GetPositions(filename, src string) *[]Brace {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, filename, nil, 0)
 	if err != nil {
 		panic(err)
 	}
+	Inspect(f, fset)
+	return &bracePositions
+}
+
+func Inspect(f ast.Node, fset *token.FileSet) {
 	ast.Inspect(f, func(n ast.Node) bool {
 		switch n.(type) {
 		case *ast.BlockStmt:
@@ -57,5 +47,4 @@ func getPositions(filename, src string) {
 		}
 		return true
 	})
-	info.Braces = &bracePositions
 }
